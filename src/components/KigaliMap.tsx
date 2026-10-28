@@ -337,13 +337,12 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
       <div ref={mapContainerRef} className="w-full h-full z-0" />
 
       {/* Floating Control Stack on the Right (Layers, Locate Me, Zoom Controls) */}
-      {/* Positioned at top-36 on mobile to guarantee clear vertical separation below the Chokepoint Radar */}
-      <div className="absolute top-36 sm:top-28 right-3 sm:right-3.5 z-10 flex flex-col gap-2">
+      <div className="absolute top-28 sm:top-24 right-2.5 sm:right-3.5 z-10 flex flex-col gap-1.5 sm:gap-2">
         {/* Layer Switcher Button */}
         <div className="relative">
           <button
             onClick={() => setIsLayerMenuOpen(!isLayerMenuOpen)}
-            className={`w-10 h-10 rounded-2xl backdrop-blur-md border shadow-xl flex items-center justify-center active:scale-95 transition-all ${
+            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl backdrop-blur-md border shadow-xl flex items-center justify-center active:scale-95 transition-all ${
               isDarkMode
                 ? 'bg-slate-900/90 border-slate-700/80 text-slate-200 hover:bg-slate-800'
                 : 'bg-white/95 border-slate-200 text-slate-700 hover:bg-slate-100 shadow-slate-200/50'
@@ -389,7 +388,7 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
         {/* Live GPS Locate Me & Follow Button */}
         <button
           onClick={onLocateMe}
-          className={`w-10 h-10 rounded-2xl backdrop-blur-md border shadow-xl flex items-center justify-center transition-all active:scale-95 ${
+          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl backdrop-blur-md border shadow-xl flex items-center justify-center transition-all active:scale-95 ${
             isFollowingUser
               ? 'bg-blue-600 border-blue-400 text-white ring-2 ring-blue-400/40 shadow-blue-600/30'
               : isDarkMode
@@ -402,12 +401,12 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
         </button>
 
         {/* Clean Modern Zoom In / Zoom Out Controls */}
-        <div className={`backdrop-blur-md border rounded-2xl shadow-xl flex flex-col overflow-hidden ${
+        <div className={`backdrop-blur-md border rounded-xl sm:rounded-2xl shadow-xl flex flex-col overflow-hidden ${
           isDarkMode ? 'bg-slate-900/90 border-slate-700/80' : 'bg-white/95 border-slate-200 shadow-slate-200/50'
         }`}>
           <button
             onClick={handleZoomIn}
-            className={`w-10 h-9 flex items-center justify-center transition-all border-b ${
+            className={`w-9 h-8 sm:w-10 sm:h-9 flex items-center justify-center transition-all border-b ${
               isDarkMode
                 ? 'text-slate-300 hover:text-white hover:bg-slate-800 active:bg-slate-700 border-slate-800'
                 : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 border-slate-200'
@@ -418,7 +417,7 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
           </button>
           <button
             onClick={handleZoomOut}
-            className={`w-10 h-9 flex items-center justify-center transition-all ${
+            className={`w-9 h-8 sm:w-10 sm:h-9 flex items-center justify-center transition-all ${
               isDarkMode
                 ? 'text-slate-300 hover:text-white hover:bg-slate-800 active:bg-slate-700'
                 : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200'

@@ -139,19 +139,19 @@ export const SpotterModal: React.FC<SpotterModalProps> = ({
     <div className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-md transition-all ${
       isDarkMode ? 'bg-black/75' : 'bg-slate-900/40'
     }`}>
-      <div className={`rounded-t-3xl sm:rounded-3xl w-full max-w-lg shadow-2xl relative max-h-[92vh] flex flex-col overflow-hidden animate-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 duration-200 border transition-colors ${
+      <div className={`rounded-t-3xl sm:rounded-3xl w-full max-w-lg shadow-2xl relative max-h-[90dvh] sm:max-h-[85vh] flex flex-col overflow-hidden animate-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 duration-200 border transition-colors ${
         isDarkMode
           ? 'bg-slate-900 border-slate-700/80 text-slate-100'
           : 'bg-white border-slate-200 text-slate-900 shadow-slate-300/50'
       }`}>
         
         {/* Grab Handle (Mobile Swipe Cue) */}
-        <div className="pt-3 pb-1 flex justify-center sm:hidden cursor-pointer" onClick={onClose}>
+        <div className="pt-2.5 pb-1 flex justify-center sm:hidden cursor-pointer" onClick={onClose}>
           <div className={`w-12 h-1.5 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-300'}`} />
         </div>
 
         {/* Modal Header */}
-        <div className={`p-4 sm:p-5 pb-3 border-b flex items-center justify-between shrink-0 ${
+        <div className={`p-3.5 sm:p-5 pb-2.5 sm:pb-3 border-b flex items-center justify-between shrink-0 ${
           isDarkMode ? 'border-slate-800' : 'border-slate-200'
         }`}>
           <div className="flex items-center gap-2.5">
@@ -180,7 +180,7 @@ export const SpotterModal: React.FC<SpotterModalProps> = ({
         </div>
 
         {/* Scrollable Form Body */}
-        <form onSubmit={handleSubmit} id="spotter-form" className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
+        <form onSubmit={handleSubmit} id="spotter-form" className="p-3.5 sm:p-5 space-y-3 sm:space-y-4 overflow-y-auto overscroll-contain flex-1">
           {/* Category Tiles */}
           <div>
             <label className={`block text-[11px] font-bold uppercase tracking-wider mb-2 ${
@@ -331,13 +331,13 @@ export const SpotterModal: React.FC<SpotterModalProps> = ({
         </form>
 
         {/* Sticky Action Footer */}
-        <div className={`p-3.5 sm:p-4 border-t flex items-center justify-end gap-2.5 shrink-0 ${
+        <div className={`p-3 sm:p-4 border-t flex items-center justify-end gap-2.5 shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] ${
           isDarkMode ? 'bg-slate-950/90 border-slate-800/80' : 'bg-slate-50/95 border-slate-200'
         }`}>
           <button
             type="button"
             onClick={onClose}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+            className={`px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${
               isDarkMode ? 'bg-slate-800 text-slate-300 hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
             }`}
           >
@@ -346,7 +346,7 @@ export const SpotterModal: React.FC<SpotterModalProps> = ({
           <button
             type="submit"
             form="spotter-form"
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 via-rose-600 to-amber-500 text-white font-extrabold text-xs shadow-xl shadow-orange-600/30 hover:brightness-110 active:scale-95 transition-all"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 sm:px-6 sm:py-2.5 rounded-xl bg-gradient-to-r from-orange-500 via-rose-600 to-amber-500 text-white font-extrabold text-xs shadow-xl shadow-orange-600/30 hover:brightness-110 active:scale-95 transition-all"
           >
             <Send className="w-3.5 h-3.5" />
             <span>Broadcast Alert</span>

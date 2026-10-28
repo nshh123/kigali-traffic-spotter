@@ -221,7 +221,7 @@ export function App() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden flex flex-col bg-slate-950 font-sans select-none">
+    <div className="relative w-full h-[100dvh] min-h-[100dvh] max-h-[100dvh] overflow-hidden flex flex-col bg-slate-950 font-sans select-none">
       {/* 1. Full-Bleed Map Canvas */}
       <div className="absolute inset-0 z-0">
         <KigaliMap
@@ -312,13 +312,13 @@ export function App() {
       {/* 3. Waze-Style Floating Action Button (FAB) at Bottom Right */}
       {/* Auto-hides on mobile when route sheet is expanded to eliminate collisions */}
       {(!isRouteDrawerExpanded || window.innerWidth > 640) && (
-        <div className="absolute bottom-20 sm:bottom-6 right-3 sm:right-6 z-20 pointer-events-auto transition-all">
+        <div className="absolute bottom-16 sm:bottom-6 right-3 sm:right-6 z-20 pointer-events-auto transition-all">
           <button
             onClick={() => {
               setSpotterCoords(userLocation || { lat: -1.9441, lng: 30.0619, label: 'Kigali Area' });
               setIsSpotterModalOpen(true);
             }}
-            className="group relative flex items-center gap-2 bg-gradient-to-r from-orange-500 via-rose-600 to-amber-500 text-white font-black text-xs px-3.5 sm:px-4 py-3 rounded-2xl shadow-2xl shadow-orange-600/50 hover:shadow-orange-600/70 border border-white/20 transition-all transform hover:scale-105 active:scale-95"
+            className="group relative flex items-center gap-2 bg-gradient-to-r from-orange-500 via-rose-600 to-amber-500 text-white font-black text-xs px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl shadow-2xl shadow-orange-600/50 hover:shadow-orange-600/70 border border-white/20 transition-all transform hover:scale-105 active:scale-95"
           >
             <div className="absolute -inset-0.5 rounded-2xl bg-orange-500 opacity-30 group-hover:opacity-60 blur-sm animate-pulse" />
             <AlertTriangle className="w-4 h-4 text-white shrink-0 relative z-10" />
@@ -328,7 +328,7 @@ export function App() {
       )}
 
       {/* 4. Bottom Navigation Drawer (Mobile Bottom Sheet / Desktop Card) */}
-      <div className="absolute bottom-0 inset-x-0 sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-md p-2.5 sm:p-0 z-20 pointer-events-none">
+      <div className="absolute bottom-0 inset-x-0 sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-md p-2 sm:p-0 pb-[max(0.5rem,env(safe-area-inset-bottom))] z-20 pointer-events-none">
         <RoutePlanner
           origin={origin}
           destination={destination}

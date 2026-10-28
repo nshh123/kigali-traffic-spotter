@@ -30,14 +30,19 @@ export const IncidentDetailsModal: React.FC<IncidentDetailsModalProps> = ({
     <div className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm transition-all pointer-events-auto ${
       isDarkMode ? 'bg-black/60' : 'bg-slate-900/40'
     }`}>
-      <div className={`rounded-t-3xl sm:rounded-3xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative border transition-colors ${
+      <div className={`rounded-t-3xl sm:rounded-3xl w-full max-w-md p-4 sm:p-6 shadow-2xl relative border transition-colors max-h-[92dvh] sm:max-h-[88vh] flex flex-col overflow-y-auto overscroll-contain pb-[max(1rem,env(safe-area-inset-bottom))] ${
         isDarkMode
           ? 'bg-slate-900 border-slate-800 text-slate-100'
           : 'bg-white border-slate-200 text-slate-900 shadow-slate-300/50'
       }`}>
+        {/* Mobile Swipe Grab Handle */}
+        <div className="pt-0 pb-2.5 flex justify-center sm:hidden cursor-pointer" onClick={onClose}>
+          <div className={`w-10 h-1 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-300'}`} />
+        </div>
+
         <button
           onClick={onClose}
-          className={`absolute top-4 right-4 p-2 rounded-xl transition-all ${
+          className={`absolute top-3.5 right-3.5 sm:top-4 sm:right-4 p-2 rounded-xl transition-all ${
             isDarkMode ? 'bg-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
           }`}
           title="Close"

@@ -81,25 +81,25 @@ export const RoutePlanner: React.FC<RoutePlannerProps> = ({
       {!isExpanded && (
         <div
           onClick={() => onToggleExpand(true)}
-          className={`backdrop-blur-xl border rounded-2xl p-3 px-4 shadow-2xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.99] ${
+          className={`backdrop-blur-xl border rounded-2xl p-2.5 px-3.5 sm:p-3 sm:px-4 shadow-2xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.99] ${
             isDarkMode
               ? 'bg-slate-900/95 border-slate-700/80 text-white hover:border-blue-500/50'
               : 'bg-white/95 border-slate-200 text-slate-900 hover:border-blue-400 shadow-slate-200/50'
           }`}
         >
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md">
-              <Navigation2 className="w-4 h-4 text-white" />
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md">
+              <Navigation2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             </div>
 
             <div className="min-w-0">
               {selectedRoute ? (
                 <>
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className={`font-black text-sm tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                    <span className={`font-black text-xs sm:text-sm tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                       {selectedRoute.durationMinutes} min
                     </span>
-                    <span className={`text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <span className={`text-[10px] sm:text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                       ({selectedRoute.distanceKm} km)
                     </span>
                     {selectedRoute.isAlternative && (
@@ -108,7 +108,7 @@ export const RoutePlanner: React.FC<RoutePlannerProps> = ({
                       </span>
                     )}
                   </div>
-                  <p className={`text-[11px] truncate font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                  <p className={`text-[10px] sm:text-[11px] truncate font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
                     {origin?.label?.split(' ')[0]} → {destination?.label?.split(' ')[0]}
                   </p>
                 </>
@@ -127,8 +127,8 @@ export const RoutePlanner: React.FC<RoutePlannerProps> = ({
 
           <div className="flex items-center gap-2 shrink-0 ml-2">
             <span className="text-[11px] font-bold text-blue-500 hidden sm:inline">Change</span>
-            <div className={`p-1.5 rounded-xl border ${isDarkMode ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-200'}`}>
-              <ChevronUp className="w-4 h-4" />
+            <div className={`p-1 sm:p-1.5 rounded-xl border ${isDarkMode ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-200'}`}>
+              <ChevronUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
         </div>
@@ -137,29 +137,29 @@ export const RoutePlanner: React.FC<RoutePlannerProps> = ({
       {/* 2. EXPANDED BOTTOM SHEET */}
       {isExpanded && (
         <div
-          className={`backdrop-blur-2xl border rounded-t-3xl sm:rounded-3xl p-4 sm:p-5 shadow-2xl space-y-3.5 max-h-[80vh] overflow-y-auto transition-colors ${
+          className={`backdrop-blur-2xl border rounded-t-3xl sm:rounded-3xl p-3 sm:p-5 shadow-2xl flex flex-col max-h-[72dvh] sm:max-h-[80vh] overflow-hidden transition-colors ${
             isDarkMode
               ? 'bg-slate-900/95 border-slate-700/80 text-slate-100'
               : 'bg-white/95 border-slate-200 text-slate-900 shadow-slate-200/50'
           }`}
         >
           {/* Grab Bar & Header */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center shrink-0 mb-2 sm:mb-3">
             <div
-              className={`w-10 h-1 rounded-full mb-3 cursor-pointer ${isDarkMode ? 'bg-slate-700' : 'bg-slate-300'}`}
+              className={`w-10 h-1 rounded-full mb-2 cursor-pointer ${isDarkMode ? 'bg-slate-700' : 'bg-slate-300'}`}
               onClick={() => onToggleExpand(false)}
             />
 
             <div className={`w-full flex items-center justify-between pb-2 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-500 flex items-center justify-center font-black">
-                  <Navigation2 className="w-3.5 h-3.5" />
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-blue-500/20 text-blue-500 flex items-center justify-center font-black">
+                  <Navigation2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </div>
                 <div>
                   <h2 className={`font-extrabold text-xs sm:text-sm tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                     Kigali Route Recommender
                   </h2>
-                  <p className={`text-[10px] ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <p className={`text-[9px] sm:text-[10px] ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                     Avoid chokepoints & hill gridlocks
                   </p>
                 </div>
@@ -167,14 +167,14 @@ export const RoutePlanner: React.FC<RoutePlannerProps> = ({
 
               <button
                 onClick={() => onToggleExpand(false)}
-                className={`flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg border ${
+                className={`flex items-center gap-1 text-[10px] sm:text-[11px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border ${
                   isDarkMode
                     ? 'bg-slate-800 text-slate-300 hover:text-white border-slate-700'
                     : 'bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-200'
                 }`}
               >
                 <span>View Map</span>
-                <ChevronDown className="w-3.5 h-3.5" />
+                <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
             </div>
           </div>
@@ -299,12 +299,12 @@ export const RoutePlanner: React.FC<RoutePlannerProps> = ({
 
           {/* Route Options Comparison List */}
           {isLoadingRoutes ? (
-            <div className="py-6 flex flex-col items-center justify-center text-slate-400 text-xs gap-2">
-              <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <div className="py-4 sm:py-6 flex flex-col items-center justify-center text-slate-400 text-xs gap-2 shrink-0">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
               <span className="font-medium text-[11px]">Analyzing Kigali bypass routes...</span>
             </div>
           ) : routes.length > 0 ? (
-            <div className="space-y-2 max-h-48 overflow-y-auto pr-0.5">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0.5 space-y-2 max-h-[36dvh] sm:max-h-56">
               {routes.map((route) => {
                 const isSelected = route.id === activeRouteId;
                 const isAlternative = route.isAlternative;
