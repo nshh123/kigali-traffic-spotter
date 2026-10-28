@@ -9,7 +9,8 @@ import { SpotterModal } from './components/SpotterModal';
 import { IncidentDetailsModal } from './components/IncidentDetailsModal';
 import { ChokepointRadar } from './components/ChokepointRadar';
 import { AppLogo } from './components/AppLogo';
-import { RefreshCw, AlertTriangle, Sun, Moon } from 'lucide-react';
+import { InstallPromptModal } from './components/InstallPromptModal';
+import { RefreshCw, AlertTriangle, Sun, Moon, Download } from 'lucide-react';
 
 export function App() {
   const [incidents, setIncidents] = useState<TrafficIncident[]>([]);
@@ -35,11 +36,11 @@ export function App() {
   const [isLoadingRoutes, setIsLoadingRoutes] = useState(false);
   const [isRouteDrawerExpanded, setIsRouteDrawerExpanded] = useState(false);
 
-  // Theme State: Dark mode (default) vs Light mode
+  // Theme State: Light mode (default) vs Dark mode
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem('kigali_theme');
-    if (saved) return saved === 'dark';
-    return true;
+    if (saved !== null) return saved === 'dark';
+    return false; // App starts in light mode by default
   });
 
   const toggleTheme = () => {
@@ -49,6 +50,17 @@ export function App() {
       return next;
     });
   };
+
+  // Sync mobile browser status bar / theme color with active theme
+  useEffect(() => {
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute('content', isDarkMode ? '#0f172a' : '#ffffff');
+    }
+  }, [isDarkMode]);
+
+  // PWA Install State
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
 
   // Live GPS Location & Follow Mode State
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
@@ -221,7 +233,11 @@ export function App() {
   };
 
   return (
-    <div className="relative w-full h-[100dvh] min-h-[100dvh] max-h-[100dvh] overflow-hidden flex flex-col bg-slate-950 font-sans select-none">
+    <div
+      className={`relative w-full h-[100dvh] min-h-[100dvh] max-h-[100dvh] overflow-hidden flex flex-col font-sans select-none transition-colors duration-200 ${
+        isDarkMode ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-900'
+      }`}
+    >
       {/* 1. Full-Bleed Map Canvas */}
       <div className="absolute inset-0 z-0">
         <KigaliMap
@@ -268,6 +284,20 @@ export function App() {
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-1.5">
+            {/* Install PWA Button */}
+            <button
+              onClick={() => setIsInstallModalOpen(true)}
+              className={`p-2 rounded-xl border transition-all shadow-sm active:scale-95 flex items-center gap-1.5 ${
+                isDarkMode
+                  ? 'bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border-blue-500/30'
+                  : 'bg-blue-50 hover:bg-blue-100 text-blue-600 border-blue-200'
+              }`}
+              title="Install Kigali Traffic App"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline text-xs font-bold">Install</span>
+            </button>
+
             {/* Light / Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
@@ -281,15 +311,15 @@ export function App() {
               {isDarkMode ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-indigo-600" />}
             </button>
 
-            {/* Refresh Button */}
+            {/* Refresh / Reload Button */}
             <button
-              onClick={loadIncidents}
+              onClick={() => window.location.reload()}
               className={`p-2 rounded-xl border transition-all shadow-sm active:scale-95 ${
                 isDarkMode
                   ? 'bg-slate-800/90 hover:bg-slate-750 text-slate-300 hover:text-white border-slate-700'
                   : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-300'
               }`}
-              title="Refresh incidents"
+              title="Reload App"
             >
               <RefreshCw className="w-3.5 h-3.5" />
             </button>
@@ -370,6 +400,13 @@ export function App() {
           onNavigateAround={handleNavigateAround}
         />
       )}
+
+      {/* PWA Install Prompt Banner / Dialog */}
+      <InstallPromptModal
+        isDarkMode={isDarkMode}
+        forceOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+      />
     </div>
   );
 }
