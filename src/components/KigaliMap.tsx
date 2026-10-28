@@ -337,7 +337,7 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
       <div ref={mapContainerRef} className="w-full h-full z-0" />
 
       {/* Floating Control Stack on the Right (Layers, Locate Me, Zoom Controls) */}
-      <div className="absolute top-28 sm:top-24 right-2.5 sm:right-3.5 z-10 flex flex-col gap-1.5 sm:gap-2">
+      <div className="absolute top-32 sm:top-28 right-2.5 sm:right-3.5 z-10 flex flex-col gap-1.5 sm:gap-2">
         {/* Layer Switcher Button */}
         <div className="relative">
           <button
