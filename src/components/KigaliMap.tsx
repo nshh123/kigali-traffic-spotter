@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
-import type { Coordinates, KigaliHotspot, RouteOption, TrafficIncident } from '../types';
+import type { Coordinates, KigaliHotspot, RouteOption, TrafficCorridor, TrafficIncident } from '../types';
 import { KIGALI_CENTER } from '../data/kigaliHotspots';
-import { Layers, Mountain, Map as MapIcon, Compass, Plus, Minus, Crosshair } from 'lucide-react';
+import { Layers, Mountain, Map as MapIcon, Compass, Plus, Minus, Crosshair, Activity } from 'lucide-react';
 
 interface KigaliMapProps {
   incidents: TrafficIncident[];
   hotspots: KigaliHotspot[];
+  corridors: TrafficCorridor[];
   selectedOrigin: Coordinates | null;
   selectedDestination: Coordinates | null;
   routes: RouteOption[];
@@ -15,11 +16,14 @@ interface KigaliMapProps {
   isLocating: boolean;
   isFollowingUser: boolean;
   isDarkMode?: boolean;
+  showTrafficFlow?: boolean;
+  onToggleTrafficFlow?: () => void;
   onLocateMe: () => void;
   onSelectRoute: (routeId: string) => void;
   onMapClick: (coords: Coordinates) => void;
   onIncidentClick: (incident: TrafficIncident) => void;
   onHotspotClick: (hotspot: KigaliHotspot) => void;
+  onCorridorClick?: (corridor: TrafficCorridor) => void;
 }
 
 type MapTheme = 'esri' | 'osm_hot' | 'osm';
@@ -27,6 +31,7 @@ type MapTheme = 'esri' | 'osm_hot' | 'osm';
 export const KigaliMap: React.FC<KigaliMapProps> = ({
   incidents,
   hotspots,
+  corridors,
   selectedOrigin,
   selectedDestination,
   routes,
@@ -35,15 +40,19 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
   isLocating,
   isFollowingUser,
   isDarkMode = true,
+  showTrafficFlow = true,
+  onToggleTrafficFlow,
   onLocateMe,
   onSelectRoute,
   onMapClick,
   onIncidentClick,
   onHotspotClick,
+  onCorridorClick,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const corridorsLayerRef = useRef<L.LayerGroup | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const routesLayerRef = useRef<L.LayerGroup | null>(null);
   const userLocationMarkerRef = useRef<L.Marker | null>(null);
@@ -79,7 +88,7 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
     const map = L.map(mapContainerRef.current, {
       center: [KIGALI_CENTER.lat, KIGALI_CENTER.lng],
       zoom: KIGALI_CENTER.zoom,
-      zoomControl: false, // Prevents bottom-right collision with FAB!
+      zoomControl: false,
     });
 
     const initialTheme = themeConfigs[currentTheme];
@@ -88,6 +97,7 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
       maxZoom: 19,
     }).addTo(map);
 
+    corridorsLayerRef.current = L.layerGroup().addTo(map);
     markersLayerRef.current = L.layerGroup().addTo(map);
     routesLayerRef.current = L.layerGroup().addTo(map);
 
@@ -129,10 +139,76 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
     mapInstanceRef.current?.zoomOut();
   };
 
+  // Render Arterial Traffic Flow Corridors
+  useEffect(() => {
+    const corridorsLayer = corridorsLayerRef.current;
+    if (!corridorsLayer) return;
+
+    corridorsLayer.clearLayers();
+    if (!showTrafficFlow || !corridors || corridors.length === 0) return;
+
+    corridors.forEach((corridor) => {
+      const color =
+        corridor.status === 'blocked'
+          ? '#a855f7' // Purple / Blocked
+          : corridor.status === 'congested'
+          ? '#ef4444' // Red / Standstill
+          : corridor.status === 'slow'
+          ? '#f59e0b' // Amber / Slow
+          : '#10b981'; // Emerald / Free flow
+
+      // Glow casing underneath
+      const glow = L.polyline(corridor.coordinates, {
+        color,
+        weight: corridor.status === 'congested' || corridor.status === 'blocked' ? 10 : 7,
+        opacity: 0.3,
+        lineCap: 'round',
+        lineJoin: 'round',
+      });
+      corridorsLayer.addLayer(glow);
+
+      // Core crisp flow line
+      const line = L.polyline(corridor.coordinates, {
+        color,
+        weight: corridor.status === 'congested' || corridor.status === 'blocked' ? 5 : 4,
+        opacity: 0.9,
+        dashArray: corridor.status === 'blocked' ? '6, 6' : undefined,
+        lineCap: 'round',
+        lineJoin: 'round',
+      });
+
+      const popupContent = `
+        <div style="font-family: system-ui, -apple-system, sans-serif; font-size: 12px; line-height: 1.4; padding: 4px; min-width: 170px;">
+          <div style="font-weight: 800; font-size: 13px; color: ${color}; display: flex; align-items: center; justify-content: space-between;">
+            <span>${corridor.roadCode}</span>
+            <span style="font-size: 10px; background: #00000015; padding: 2px 5px; border-radius: 4px;">~${corridor.speedKmh} km/h</span>
+          </div>
+          <div style="font-weight: 700; color: #1e293b; margin: 3px 0;">${corridor.name}</div>
+          <div style="color: #64748b; font-size: 11px;">${corridor.description}</div>
+          <div style="margin-top: 6px; display: flex; gap: 8px; font-weight: 700; font-size: 11px;">
+            ${
+              corridor.delayMinutes > 0
+                ? `<span style="color: #dc2626;">+${corridor.delayMinutes}m delay</span>`
+                : '<span style="color: #10b981;">Flowing Smoothly</span>'
+            }
+          </div>
+        </div>
+      `;
+      line.bindPopup(popupContent);
+      line.on('click', () => onCorridorClick?.(corridor));
+      corridorsLayer.addLayer(line);
+    });
+  }, [corridors, showTrafficFlow, onCorridorClick]);
+
   // Pan to user when userLocation changes and following is active
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map || !userLocation) return;
+
+    const speedDisplay =
+      userLocation.speedKmh !== undefined && userLocation.speedKmh > 2
+        ? `${Math.round(userLocation.speedKmh)}k`
+        : '';
 
     // Render / update pulsing blue GPS location marker
     if (userLocationMarkerRef.current) {
@@ -140,8 +216,14 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
     } else {
       const userDotHtml = `
         <div class="relative flex items-center justify-center cursor-pointer" style="transform: translate(-50%, -50%);">
-          <div class="absolute w-8 h-8 rounded-full bg-blue-500/30 animate-ping"></div>
-          <div class="relative w-4 h-4 rounded-full bg-blue-500 border-2 border-white shadow-lg"></div>
+          <div class="absolute w-9 h-9 rounded-full bg-blue-500/30 animate-ping"></div>
+          <div class="relative w-4 h-4 rounded-full bg-blue-500 border-2 border-white shadow-xl flex items-center justify-center">
+            ${
+              speedDisplay
+                ? `<span class="absolute -top-3.5 px-1 py-0.2 rounded-full bg-slate-900 text-[8px] font-mono font-bold text-blue-300 border border-blue-400">${speedDisplay}</span>`
+                : ''
+            }
+          </div>
         </div>
       `;
 
@@ -207,25 +289,24 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
     });
 
     // 2. Render Kigali Chokepoint Hotspots: Positioned BELOW the anchor point (translate -50%, 6px)
-    // This guarantees ZERO overlap with incident pins at the same junction!
     hotspots.forEach((spot) => {
       const statusColor =
         spot.status === 'blocked'
-          ? 'bg-rose-500'
+          ? 'bg-purple-500'
           : spot.status === 'congested'
-          ? 'bg-orange-500'
+          ? 'bg-rose-500'
           : spot.status === 'slow'
           ? 'bg-amber-400'
           : 'bg-emerald-500';
 
       const html = `
         <div class="flex items-center gap-1.5 bg-slate-900/95 text-white pl-2 pr-2.5 py-1 rounded-full border border-slate-700 shadow-xl text-[10px] font-bold whitespace-nowrap cursor-pointer hover:bg-slate-800 transition-all backdrop-blur-md" style="transform: translate(-50%, 6px);">
-          <span class="w-2 h-2 rounded-full ${statusColor} shrink-0 animate-pulse"></span>
+          <span class="w-2 h-2 rounded-full ${statusColor} shrink-0 ${spot.status === 'congested' || spot.status === 'blocked' ? 'animate-ping' : 'animate-pulse'}"></span>
           <span>${spot.name.split(' ')[0]}</span>
           ${
             spot.currentDelayMinutes > 0
               ? `<span class="text-amber-300 font-mono text-[9px] font-extrabold">+${spot.currentDelayMinutes}m</span>`
-              : ''
+              : `<span class="text-emerald-400 font-mono text-[9px]">Flowing</span>`
           }
         </div>
       `;
@@ -336,8 +417,50 @@ export const KigaliMap: React.FC<KigaliMapProps> = ({
     <div className="relative w-full h-full">
       <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-      {/* Floating Control Stack on the Right (Layers, Locate Me, Zoom Controls) */}
+      {/* Floating Speedometer / Commute HUD when Following GPS */}
+      {isFollowingUser && userLocation && (
+        <div className={`absolute top-28 sm:top-24 left-3 z-10 backdrop-blur-xl border rounded-2xl p-2 sm:p-2.5 shadow-2xl flex items-center gap-2.5 sm:gap-3 transition-all animate-in fade-in slide-in-from-top-2 pointer-events-auto ${
+          isDarkMode
+            ? 'bg-slate-900/90 border-slate-700/80 text-white'
+            : 'bg-white/95 border-slate-200 text-slate-800 shadow-slate-200/50'
+        }`}>
+          <div className="flex flex-col items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md font-mono shrink-0">
+            <span className="text-base sm:text-lg font-black leading-none">{Math.round(userLocation.speedKmh || 0)}</span>
+            <span className="text-[8px] sm:text-[9px] font-bold opacity-80 uppercase tracking-tighter">km/h</span>
+          </div>
+          <div className="flex flex-col pr-1">
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full ${(userLocation.speedKmh || 0) < 12 ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400 ring-2 ring-emerald-400/40'}`} />
+              <span className="text-xs font-bold leading-tight">
+                {(userLocation.speedKmh || 0) < 12 ? 'Traffic Crawl' : 'Cruising Flow'}
+              </span>
+            </div>
+            <span className={`text-[10px] font-semibold mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+              Live Drive Tracking
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Control Stack on the Right (Traffic Flow, Layers, Locate Me, Zoom Controls) */}
       <div className="absolute top-32 sm:top-28 right-2.5 sm:right-3.5 z-10 flex flex-col gap-1.5 sm:gap-2">
+        {/* Live Traffic Flow Toggle Button */}
+        {onToggleTrafficFlow && (
+          <button
+            onClick={onToggleTrafficFlow}
+            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl backdrop-blur-md border shadow-xl flex items-center justify-center active:scale-95 transition-all ${
+              showTrafficFlow
+                ? 'bg-emerald-600/90 border-emerald-400 text-white shadow-emerald-600/30 ring-2 ring-emerald-400/30'
+                : isDarkMode
+                ? 'bg-slate-900/90 border-slate-700/80 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                : 'bg-white/95 border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 shadow-slate-200/50'
+            }`}
+            title={showTrafficFlow ? 'Hide Live Traffic Flow Layer' : 'Show Live Traffic Flow Layer'}
+          >
+            <Activity className="w-4 h-4" />
+          </button>
+        )}
+
         {/* Layer Switcher Button */}
         <div className="relative">
           <button
@@ -461,3 +584,4 @@ function getIncidentVisual(type: string, severity: string) {
 
   return { emoji, bg, pulse };
 }
+

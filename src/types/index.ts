@@ -26,6 +26,20 @@ export interface KigaliHotspot {
   status: 'clear' | 'slow' | 'congested' | 'blocked';
   currentDelayMinutes: number;
   description: string;
+  incidentCount?: number;
+  averageSpeedKmh?: number;
+}
+
+export interface TrafficCorridor {
+  id: string;
+  name: string;
+  roadCode: string;
+  coordinates: [number, number][]; // [lat, lng]
+  status: 'clear' | 'slow' | 'congested' | 'blocked';
+  delayMinutes: number;
+  activeIncidentCount: number;
+  speedKmh: number;
+  description: string;
 }
 
 export interface RouteOption {
@@ -45,4 +59,6 @@ export interface Coordinates {
   lat: number;
   lng: number;
   label?: string;
+  speedKmh?: number;
+  heading?: number;
 }
